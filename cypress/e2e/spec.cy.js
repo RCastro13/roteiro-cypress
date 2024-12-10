@@ -68,4 +68,65 @@ describe('TODOMvc App', () => {
       .children()
       .should('have.length', 2);
   });
+
+  it('Remove todas as tarefas', () => {
+    cy.visit('');
+  
+    cy.get('[data-cy=todo-input]')
+      .type('Estudar Cypress{enter}')
+      .type('Estudar React{enter}');
+  
+    cy.get('[data-cy=todos-list] > li [data-cy=remove-todo-btn]')
+      .each(($btn) => {
+        cy.wrap($btn).invoke('show').click();
+      });
+  
+    cy.get('[data-cy=todos-list]')
+      .children()
+      .should('have.length', 0);
+  });
+
+  it('Edita uma tarefa', () => {
+    cy.visit('');
+  
+    cy.get('[data-cy="todo-input"]')
+      .type('Ler o capítulo 4{enter}');
+  
+    cy.get('[data-cy="todos-list"] > li')
+      .dblclick();
+
+    cy.get('.editing .edit')
+      .clear()
+      .type('Ler o capítulo 5{enter}');
+  
+    cy.get('[data-cy="todos-list"] > li')
+      .should('have.length', 1)
+      .first()
+      .should('contain.text', 'Ler o capítulo 5');
+  });
+
+  it('Edita todas as tarefas ativas para completas', () => {
+    cy.visit('');
+
+    cy.get('[data-cy=todo-input]')
+      .type('Comprar leite{enter}')
+      .type('Estudar Cypress{enter}')
+      .type('Ler livro{enter}');
+  
+    cy.get('[data-cy=todos-list] > li')
+      .each(($el) => {
+        cy.wrap($el)
+          .find('[data-cy=toggle-todo-checkbox]')
+          .check(); 
+      });
+  
+    cy.get('[data-cy=todos-list] > li')
+      .each(($el) => {
+        cy.wrap($el)
+          .find('[data-cy=toggle-todo-checkbox]')
+          .should('be.checked'); 
+      });
+  
+    cy.get('.todo-count').should('not.contain', '3 items left'); 
+  });
 });
